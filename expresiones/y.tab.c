@@ -19,11 +19,17 @@
 
 #line 3 "exp.yacc"
 	#include<stdio.h>
+	#include<string.h>
+	#include<stdlib.h>
 	int flag=0;
 	int yylex();
 	#define YYSTYPE char *
 	int count=0;
-#line 27 "y.tab.c"
+	char *arbol="";
+	char aux[100];
+	char *auxNeg="";
+	char *nodoRaiz="";
+#line 33 "y.tab.c"
 
 #if ! defined(YYSTYPE) && ! defined(YYSTYPE_IS_DECLARED)
 /* Default: YYSTYPE is the semantic value type. */
@@ -72,30 +78,30 @@ static const YYINT yylen[] = {                            2,
     1,    3,    2,    3,    3,    3,    3,    3,    1,
 };
 static const YYINT yydefred[] = {                         0,
-    9,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+    9,    0,    0,    0,    0,    3,    0,    0,    0,    0,
     0,    0,    8,    2,    4,    5,    6,    7,
 };
 static const YYINT yydgoto[] = {                          4,
     5,
 };
 static const YYINT yysindex[] = {                       -40,
-    0,  -40,  -40,    0,  -27,  -25,  -34,  -40,  -40,  -40,
+    0,  -40,  -40,    0,  -17,    0,  -35,  -40,  -40,  -40,
   -40,  -40,    0,    0,    0,    0,    0,    0,
 };
 static const YYINT yyrindex[] = {                         0,
-    0,    0,    0,    0,    2,    1,    0,    0,    0,    0,
+    0,    0,    0,    0,    1,    0,    0,    0,    0,    0,
     0,    0,    0,    0,    0,    0,    0,    0,
 };
-static const YYINT yygindex[] = {                        15,
-   26,
+static const YYINT yygindex[] = {                         7,
+    8,
 };
 #define YYTABLESIZE 217
 static const YYINT yytable[] = {                          3,
-    3,    1,   12,    0,    2,    0,   13,   10,    8,   12,
-    9,   12,   11,    0,   10,    8,   10,    9,    0,   11,
-    0,   11,   14,   15,   16,   17,   18,    6,    7,    0,
+    1,   12,    0,    0,    2,   13,   10,    8,    6,    9,
+    7,   11,    0,    0,   14,   15,   16,   17,   18,   12,
+    0,    0,    0,    0,   10,    8,    0,    9,    0,   11,
     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-    0,    3,    1,    3,    0,    3,    0,    0,    0,    0,
+    0,    1,    0,    0,    0,    0,    0,    0,    0,    0,
     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -115,11 +121,11 @@ static const YYINT yytable[] = {                          3,
     0,    0,    0,    0,    0,    0,    1,
 };
 static const YYINT yycheck[] = {                         40,
-    0,    0,   37,   -1,   45,   -1,   41,   42,   43,   37,
-   45,   37,   47,   -1,   42,   43,   42,   45,   -1,   47,
-   -1,   47,    8,    9,   10,   11,   12,    2,    3,   -1,
+    0,   37,   -1,   -1,   45,   41,   42,   43,    2,   45,
+    3,   47,   -1,   -1,    8,    9,   10,   11,   12,   37,
+   -1,   -1,   -1,   -1,   42,   43,   -1,   45,   -1,   47,
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
-   -1,   41,   41,   43,   -1,   45,   -1,   -1,   -1,   -1,
+   -1,   41,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
@@ -161,7 +167,7 @@ static const char *const yyrule[] = {
 "$accept : T",
 "T : E",
 "E : E '+' T",
-"E : '-' E",
+"E : '-' T",
 "E : E '-' T",
 "E : E '*' T",
 "E : E '/' T",
@@ -205,7 +211,7 @@ typedef struct {
 } YYSTACKDATA;
 /* variables for the parser stack */
 static YYSTACKDATA yystack;
-#line 31 "exp.yacc"
+#line 37 "exp.yacc"
 /*Codigo en C*/
 void yyerror(char *s) {
     fprintf(stderr, "yeet : %s\n" , s);
@@ -216,12 +222,24 @@ void main(){
 	yyparse();
 	if(flag==0){
 		printf("\nExpresion aritmetica valida\n\n");
+		printf("%s",arbol);
+		count++;
+		printf("Nivel %d: %s",count,nodoRaiz);
 		printf("Counter de nodos: %d \n ",count);
 	}else{
 		printf("\nExpresion invalida\n\n");
 	}
 }
-#line 225 "y.tab.c"
+
+char* concat(const char *s1, const char *s2)
+{
+    char *result = malloc(strlen(s1) + strlen(s2) + 1); // +1 for the null-terminator
+    // in real code you would check for errors in malloc here
+    strcpy(result, s1);
+    strcat(result, s2);
+    return result;
+}
+#line 243 "y.tab.c"
 
 #if YYDEBUG
 #include <stdio.h>	/* needed for printf */
@@ -421,38 +439,38 @@ yyreduce:
     switch (yyn)
     {
 case 2:
-#line 20 "exp.yacc"
-	{count++; /*$$=$1+$3;*/ printf("\n%c \t\t %s\n",yystack.l_mark[-2][0],yystack.l_mark[0]);printf("\t+\n");}
+#line 26 "exp.yacc"
+	{count++; auxNeg=yyval;   sprintf(aux,"Nivel %d: %c ->\t+\t<- %s\n",count,yystack.l_mark[-2][0],yystack.l_mark[0]); arbol=concat(arbol, aux); nodoRaiz=yyval; }
 break;
 case 3:
-#line 21 "exp.yacc"
-	{count++;  printf("\n%s\n",yystack.l_mark[0]);}
+#line 27 "exp.yacc"
+	{count++;  sprintf(aux,"Nivel %d: neg  %s\n",count,auxNeg); arbol=concat(arbol, aux);  nodoRaiz=yyval;}
 break;
 case 4:
-#line 22 "exp.yacc"
-	{count++; printf("\n%s\n",yystack.l_mark[-2]);}
+#line 28 "exp.yacc"
+	{count++; auxNeg=yyval; sprintf(aux,"Nivel %d: %c ->\t-\t<- %s\n",count,yystack.l_mark[-2][0],yystack.l_mark[0]); arbol=concat(arbol, aux); nodoRaiz=yyval;}
 break;
 case 5:
-#line 23 "exp.yacc"
-	{count++; printf("\n%s\n",yystack.l_mark[-2]);}
+#line 29 "exp.yacc"
+	{count++;auxNeg=yyval;  sprintf(aux,"Nivel %d: %c ->\t*\t<- %s\n",count,yystack.l_mark[-2][0],yystack.l_mark[0]); arbol=concat(arbol, aux); nodoRaiz=yyval;}
 break;
 case 6:
-#line 24 "exp.yacc"
-	{count++; printf("\n%s\n",yystack.l_mark[-2]);}
+#line 30 "exp.yacc"
+	{count++;auxNeg=yyval;  sprintf(aux,"Nivel %d: %c ->\t/\t<- %s\n",count,yystack.l_mark[-2][0],yystack.l_mark[0]); arbol=concat(arbol, aux); nodoRaiz=yyval;}
 break;
 case 7:
-#line 25 "exp.yacc"
-	{count++; printf("\n%s \n",yystack.l_mark[-2]);}
+#line 31 "exp.yacc"
+	{count++; auxNeg=yyval;  sprintf(aux,"Nivel %d: %c ->\t%\t<- %s\n",count,yystack.l_mark[-2][0],yystack.l_mark[0]); arbol=concat(arbol, aux); nodoRaiz=yyval;}
 break;
 case 8:
-#line 26 "exp.yacc"
-	{count++; printf("\n%s\n",yystack.l_mark[-1]);}
+#line 32 "exp.yacc"
+	{count++; printf("\n(%s)\n",yystack.l_mark[-1]);}
 break;
 case 9:
-#line 27 "exp.yacc"
-	{count++; yyval=yystack.l_mark[0]; printf("var: %s \t",yystack.l_mark[0]);}
+#line 33 "exp.yacc"
+	{ yyval=yystack.l_mark[0]; auxNeg=yyval; printf("var: %s \t",yystack.l_mark[0]);}
 break;
-#line 456 "y.tab.c"
+#line 474 "y.tab.c"
     }
     yystack.s_mark -= yym;
     yystate = *yystack.s_mark;
