@@ -5,12 +5,12 @@
 #include "y.tab.h"
 
 #include "y.tab.h" 
- 
+ extern yylval;
 %}
 
 /*Seccion de reglas*/
 %%
-[a-zA-Z0-9]+ { yylval.a = yytext; return ALPHANUM ; } 
+[a-zA-Z0-9]+ { yylval = yytext; return ALPHANUM; } 
 [\t]+ ; 
 \n { return 0; } 
 

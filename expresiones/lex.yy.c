@@ -457,7 +457,7 @@ char *yytext;
 #include "y.tab.h"
 
 #include "y.tab.h" 
- 
+ extern yylval;
 /*Seccion de reglas*/
 #line 463 "lex.yy.c"
 
@@ -739,7 +739,7 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 YY_RULE_SETUP
 #line 13 "exp.lex"
-{ yylval.a = yytext; return ALPHANUM ; } 
+{ yylval = yytext; return ALPHANUM; } 
 	YY_BREAK
 case 2:
 YY_RULE_SETUP

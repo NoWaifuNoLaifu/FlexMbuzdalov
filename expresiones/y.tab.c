@@ -23,20 +23,13 @@
 	int yylex();
 	#define YYSTYPE char *
 	int count=0;
-#ifdef YYSTYPE
-#undef  YYSTYPE_IS_DECLARED
-#define YYSTYPE_IS_DECLARED 1
+#line 27 "y.tab.c"
+
+#if ! defined(YYSTYPE) && ! defined(YYSTYPE_IS_DECLARED)
+/* Default: YYSTYPE is the semantic value type. */
+typedef int YYSTYPE;
+# define YYSTYPE_IS_DECLARED 1
 #endif
-#ifndef YYSTYPE_IS_DECLARED
-#define YYSTYPE_IS_DECLARED 1
-#line 9 "exp.yacc"
-typedef union {
-    char *a;
-    double d;
-    int fn;
-} YYSTYPE;
-#endif /* !YYSTYPE_IS_DECLARED */
-#line 40 "y.tab.c"
 
 /* compatibility with bison */
 #ifdef YYPARSE_PARAM
@@ -212,7 +205,7 @@ typedef struct {
 } YYSTACKDATA;
 /* variables for the parser stack */
 static YYSTACKDATA yystack;
-#line 35 "exp.yacc"
+#line 31 "exp.yacc"
 /*Codigo en C*/
 void yyerror(char *s) {
     fprintf(stderr, "yeet : %s\n" , s);
@@ -228,7 +221,7 @@ void main(){
 		printf("\nExpresion invalida\n\n");
 	}
 }
-#line 232 "y.tab.c"
+#line 225 "y.tab.c"
 
 #if YYDEBUG
 #include <stdio.h>	/* needed for printf */
@@ -428,38 +421,38 @@ yyreduce:
     switch (yyn)
     {
 case 2:
-#line 24 "exp.yacc"
-	{count++; /*$$=$1+$3;*/ printf("\n%c %s %s %s\n",strchr(yystack.l_mark[-2],1),yystack.l_mark[-1],yystack.l_mark[0],yyval);}
+#line 20 "exp.yacc"
+	{count++; /*$$=$1+$3;*/ printf("\n%c \t\t %s\n",yystack.l_mark[-2][0],yystack.l_mark[0]);printf("\t+\n");}
 break;
 case 3:
-#line 25 "exp.yacc"
+#line 21 "exp.yacc"
 	{count++;  printf("\n%s\n",yystack.l_mark[0]);}
 break;
 case 4:
-#line 26 "exp.yacc"
+#line 22 "exp.yacc"
 	{count++; printf("\n%s\n",yystack.l_mark[-2]);}
 break;
 case 5:
-#line 27 "exp.yacc"
+#line 23 "exp.yacc"
 	{count++; printf("\n%s\n",yystack.l_mark[-2]);}
 break;
 case 6:
-#line 28 "exp.yacc"
+#line 24 "exp.yacc"
 	{count++; printf("\n%s\n",yystack.l_mark[-2]);}
 break;
 case 7:
-#line 29 "exp.yacc"
+#line 25 "exp.yacc"
 	{count++; printf("\n%s \n",yystack.l_mark[-2]);}
 break;
 case 8:
-#line 30 "exp.yacc"
+#line 26 "exp.yacc"
 	{count++; printf("\n%s\n",yystack.l_mark[-1]);}
 break;
 case 9:
-#line 31 "exp.yacc"
-	{count++; yyval=yystack.l_mark[0]; printf("%s \t",yystack.l_mark[0]);}
+#line 27 "exp.yacc"
+	{count++; yyval=yystack.l_mark[0]; printf("var: %s \t",yystack.l_mark[0]);}
 break;
-#line 463 "y.tab.c"
+#line 456 "y.tab.c"
     }
     yystack.s_mark -= yym;
     yystate = *yystack.s_mark;
