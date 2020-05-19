@@ -4,6 +4,7 @@
 	int flag=0;
 	int yylex();
 	#define YYSTYPE char *
+	int count=0;
 %}
 %union {
     char *a;
@@ -19,19 +20,15 @@
 
 /*Seccion de reglas*/
 %%
-E : '\n'  {
-                        printf("\nComplete\n");
-                        exit(1);
-                      };
-
-E:E '+' E {/*strcat($$,$1);*/ printf("Suma\n");}
-|'-' E {/*strcat($$,$2);*/ printf("Cambio de signo\n");}
-|E '-' E {/*strcat($$,$1);*/ printf("Resta\n");}
-|E '*' E {printf("Multiplicacion\n");}
-|E '/' E {printf("Division\n");}
-|E'%'E {printf("Modulo\n");}
-|'(' E ')' { printf("Encapsulación\n");}
-| ALPHANUM { $$=$1; printf("variable: %s\n",$1);}
+T: E ;
+E:E '+' T {count++; /*$$=$1+$3;*/ printf("\n%c %s %s %s\n",strchr($1,1),$2,$3,$$);}
+|'-' E {count++;  printf("\n%s\n",$2);}
+|E '-' T {count++; printf("\n%s\n",$1);}
+|E '*' T {count++; printf("\n%s\n",$1);}
+|E '/' T {count++; printf("\n%s\n",$1);}
+|E'%'T {count++; printf("\n%s \n",$1);}
+|'(' E ')' {count++; printf("\n%s\n",$2);}
+| ALPHANUM {count++; $$=$1; printf("%s \t",$1);}
 
 ;
 %%
@@ -45,6 +42,7 @@ void main(){
 	yyparse();
 	if(flag==0){
 		printf("\nExpresion aritmetica valida\n\n");
+		printf("Counter de nodos: %d \n ",count);
 	}else{
 		printf("\nExpresion invalida\n\n");
 	}
