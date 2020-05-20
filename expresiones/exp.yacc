@@ -10,7 +10,12 @@
 	char *arbol="";
 	char aux[100];
 	char *auxNeg="";
+	char *arg1 = "";
+	char *t = "t";
+	char *t_act = "";
+	char *snum[100];
 	char *nodoRaiz="";
+	char *temp_cuad[100];
 %}
 
 
@@ -23,7 +28,7 @@
 /*Seccion de reglas*/
 %%
 T: E ;
-E:E '+' T {count++; auxNeg=$$;   sprintf(aux,"Nivel %d: %c ->\t+\t<- %s\n",count,$1[0],$3); arbol=concat(arbol, aux); nodoRaiz=$$; }
+E:E '+' T {count++; auxNeg=$$;  sprintf(aux,"Nivel %d: %c ->\t+\t<- %s\n",count,$1[0],$3); arbol=concat(arbol, aux);nodoRaiz=$$; sprintf(temp_cuad, "Cuad: OP : %s, Arg1 : %c, Arg2 : %s, Res : T%d","+",$1[0],$3,count);}
 |'-' T {count++;  sprintf(aux,"Nivel %d: neg  %s\n",count,auxNeg); arbol=concat(arbol, aux);  nodoRaiz=$$;}
 |E '-' T {count++; auxNeg=$$; sprintf(aux,"Nivel %d: %c ->\t-\t<- %s\n",count,$1[0],$3); arbol=concat(arbol, aux); nodoRaiz=$$;}
 |E '*' T {count++;auxNeg=$$;  sprintf(aux,"Nivel %d: %c ->\t*\t<- %s\n",count,$1[0],$3); arbol=concat(arbol, aux); nodoRaiz=$$;}
@@ -48,6 +53,8 @@ void main(){
 		count++;
 		printf("Nivel %d: %s",count,nodoRaiz);
 		printf("Counter de nodos: %d \n ",count);
+		printf("temp_cuad : %s", temp_cuad);
+		
 	}else{
 		printf("\nExpresion invalida\n\n");
 	}
