@@ -5,7 +5,7 @@
 #define YYBYACC 1
 #define YYMAJOR 1
 #define YYMINOR 9
-#define YYPATCH 20170709
+#define YYPATCH 20140715
 
 #define YYEMPTY        (-1)
 #define yyclearin      (yychar = YYEMPTY)
@@ -29,7 +29,13 @@
 	char aux[100];
 	char *auxNeg="";
 	char *nodoRaiz="";
-#line 33 "y.tab.c"
+	int f=0;
+	char opr [40];
+	char arg1[40];
+	char arg2[40];
+	char temp[7]={'0','1','2','3','4','5','6'};
+	
+#line 39 "y.tab.c"
 
 #if ! defined(YYSTYPE) && ! defined(YYSTYPE_IS_DECLARED)
 /* Default: YYSTYPE is the semantic value type. */
@@ -211,13 +217,15 @@ typedef struct {
 } YYSTACKDATA;
 /* variables for the parser stack */
 static YYSTACKDATA yystack;
-#line 37 "exp.yacc"
+#line 57 "exp.yacc"
 /*Codigo en C*/
 void yyerror(char *s) {
     fprintf(stderr, "yeet : %s\n" , s);
 	flag=-1;
 }
 void main(){
+	
+
 	printf("\nIngresa una expresion aritmetica:\n");
 	yyparse();
 	if(flag==0){
@@ -226,6 +234,15 @@ void main(){
 		count++;
 		printf("Nivel %d: %s",count,nodoRaiz);
 		printf("Counter de nodos: %d \n ",count);
+		printf("Op \t arg1 \t arg2 \n");
+		
+		for(int x=0; x<count; x++){
+			if(opr[x]=='(' )
+				printf(" %c) \t %c \t %c \n", opr[x], arg1[x], arg2[x]);
+			else
+				printf(" %c \t %c \t %c \n", opr[x], arg1[x], arg2[x]);
+		}
+		
 	}else{
 		printf("\nExpresion invalida\n\n");
 	}
@@ -239,10 +256,10 @@ char* concat(const char *s1, const char *s2)
     strcat(result, s2);
     return result;
 }
-#line 243 "y.tab.c"
+#line 260 "y.tab.c"
 
 #if YYDEBUG
-#include <stdio.h>	/* needed for printf */
+#include <stdio.h>		/* needed for printf */
 #endif
 
 #include <stdlib.h>	/* needed for malloc, etc */
@@ -314,8 +331,6 @@ YYPARSE_DECL()
     }
 #endif
 
-    yym = 0;
-    yyn = 0;
     yynerrs = 0;
     yyerrflag = 0;
     yychar = YYEMPTY;
@@ -335,26 +350,28 @@ yyloop:
     if ((yyn = yydefred[yystate]) != 0) goto yyreduce;
     if (yychar < 0)
     {
-        yychar = YYLEX;
-        if (yychar < 0) yychar = YYEOF;
+        if ((yychar = YYLEX) < 0) yychar = YYEOF;
 #if YYDEBUG
         if (yydebug)
         {
-            if ((yys = yyname[YYTRANSLATE(yychar)]) == NULL) yys = yyname[YYUNDFTOKEN];
+            yys = yyname[YYTRANSLATE(yychar)];
             printf("%sdebug: state %d, reading %d (%s)\n",
                     YYPREFIX, yystate, yychar, yys);
         }
 #endif
     }
-    if (((yyn = yysindex[yystate]) != 0) && (yyn += yychar) >= 0 &&
-            yyn <= YYTABLESIZE && yycheck[yyn] == (YYINT) yychar)
+    if ((yyn = yysindex[yystate]) && (yyn += yychar) >= 0 &&
+            yyn <= YYTABLESIZE && yycheck[yyn] == yychar)
     {
 #if YYDEBUG
         if (yydebug)
             printf("%sdebug: state %d, shifting to state %d\n",
                     YYPREFIX, yystate, yytable[yyn]);
 #endif
-        if (yystack.s_mark >= yystack.s_last && yygrowstack(&yystack) == YYENOMEM) goto yyoverflow;
+        if (yystack.s_mark >= yystack.s_last && yygrowstack(&yystack) == YYENOMEM)
+        {
+            goto yyoverflow;
+        }
         yystate = yytable[yyn];
         *++yystack.s_mark = yytable[yyn];
         *++yystack.l_mark = yylval;
@@ -362,17 +379,18 @@ yyloop:
         if (yyerrflag > 0)  --yyerrflag;
         goto yyloop;
     }
-    if (((yyn = yyrindex[yystate]) != 0) && (yyn += yychar) >= 0 &&
-            yyn <= YYTABLESIZE && yycheck[yyn] == (YYINT) yychar)
+    if ((yyn = yyrindex[yystate]) && (yyn += yychar) >= 0 &&
+            yyn <= YYTABLESIZE && yycheck[yyn] == yychar)
     {
         yyn = yytable[yyn];
         goto yyreduce;
     }
-    if (yyerrflag != 0) goto yyinrecovery;
+    if (yyerrflag) goto yyinrecovery;
 
     YYERROR_CALL("syntax error");
 
-    goto yyerrlab; /* redundant goto avoids 'unused label' warning */
+    goto yyerrlab;
+
 yyerrlab:
     ++yynerrs;
 
@@ -382,15 +400,18 @@ yyinrecovery:
         yyerrflag = 3;
         for (;;)
         {
-            if (((yyn = yysindex[*yystack.s_mark]) != 0) && (yyn += YYERRCODE) >= 0 &&
-                    yyn <= YYTABLESIZE && yycheck[yyn] == (YYINT) YYERRCODE)
+            if ((yyn = yysindex[*yystack.s_mark]) && (yyn += YYERRCODE) >= 0 &&
+                    yyn <= YYTABLESIZE && yycheck[yyn] == YYERRCODE)
             {
 #if YYDEBUG
                 if (yydebug)
                     printf("%sdebug: state %d, error recovery shifting\
  to state %d\n", YYPREFIX, *yystack.s_mark, yytable[yyn]);
 #endif
-                if (yystack.s_mark >= yystack.s_last && yygrowstack(&yystack) == YYENOMEM) goto yyoverflow;
+                if (yystack.s_mark >= yystack.s_last && yygrowstack(&yystack) == YYENOMEM)
+                {
+                    goto yyoverflow;
+                }
                 yystate = yytable[yyn];
                 *++yystack.s_mark = yytable[yyn];
                 *++yystack.l_mark = yylval;
@@ -415,7 +436,7 @@ yyinrecovery:
 #if YYDEBUG
         if (yydebug)
         {
-            if ((yys = yyname[YYTRANSLATE(yychar)]) == NULL) yys = yyname[YYUNDFTOKEN];
+            yys = yyname[YYTRANSLATE(yychar)];
             printf("%sdebug: state %d, error recovery discards token %d (%s)\n",
                     YYPREFIX, yystate, yychar, yys);
         }
@@ -431,46 +452,59 @@ yyreduce:
                 YYPREFIX, yystate, yyn, yyrule[yyn]);
 #endif
     yym = yylen[yyn];
-    if (yym > 0)
+    if (yym)
         yyval = yystack.l_mark[1-yym];
     else
         memset(&yyval, 0, sizeof yyval);
-
     switch (yyn)
     {
 case 2:
-#line 26 "exp.yacc"
-	{count++; auxNeg=yyval;   sprintf(aux,"Nivel %d: %c ->\t+\t<- %s\n",count,yystack.l_mark[-2][0],yystack.l_mark[0]); arbol=concat(arbol, aux); nodoRaiz=yyval; }
+#line 32 "exp.yacc"
+	{count++; auxNeg=yyval;   sprintf(aux,"Nivel %d: %c ->\t+\t<- %s\n",count,yystack.l_mark[-2][0],yystack.l_mark[0]); arbol=concat(arbol, aux); nodoRaiz=yyval; 
+	if(f-1!=-1){arg1[f]=yystack.l_mark[-2][0]; arg2[f]= temp[f];}
+	else {arg1[f]=yystack.l_mark[-2][0]; arg2[f]= yystack.l_mark[-2][2]; } opr[f]= '+'; f++;}
 break;
 case 3:
-#line 27 "exp.yacc"
-	{count++;  sprintf(aux,"Nivel %d: neg  %s\n",count,auxNeg); arbol=concat(arbol, aux);  nodoRaiz=yyval;}
+#line 35 "exp.yacc"
+	{count++;  sprintf(aux,"Nivel %d: neg  %s\n",count,auxNeg); arbol=concat(arbol, aux);  nodoRaiz=yyval;
+	if(f-1!=-1){arg1[f]=yystack.l_mark[-1][0]; arg2[f]= temp[f];}
+	else {arg1[f]=yystack.l_mark[-1][0]; arg2[f]= yystack.l_mark[-1][2]; } opr[f]= '-'; f++;}
 break;
 case 4:
-#line 28 "exp.yacc"
-	{count++; auxNeg=yyval; sprintf(aux,"Nivel %d: %c ->\t-\t<- %s\n",count,yystack.l_mark[-2][0],yystack.l_mark[0]); arbol=concat(arbol, aux); nodoRaiz=yyval;}
+#line 38 "exp.yacc"
+	{count++; auxNeg=yyval; sprintf(aux,"Nivel %d: %c ->\t-\t<- %s\n",count,yystack.l_mark[-2][0],yystack.l_mark[0]); arbol=concat(arbol, aux); nodoRaiz=yyval;
+	if(f-1!=-1){arg1[f]=yystack.l_mark[-2][0]; arg2[f]= temp[f];}
+	else {arg1[f]=yystack.l_mark[-2][0]; arg2[f]= yystack.l_mark[-2][2]; } opr[f]= '-'; f++;}
 break;
 case 5:
-#line 29 "exp.yacc"
-	{count++;auxNeg=yyval;  sprintf(aux,"Nivel %d: %c ->\t*\t<- %s\n",count,yystack.l_mark[-2][0],yystack.l_mark[0]); arbol=concat(arbol, aux); nodoRaiz=yyval;}
+#line 41 "exp.yacc"
+	{count++;auxNeg=yyval;  sprintf(aux,"Nivel %d: %c ->\t*\t<- %s\n",count,yystack.l_mark[-2][0],yystack.l_mark[0]); arbol=concat(arbol, aux); nodoRaiz=yyval;
+	if(f-1!=-1){arg1[f]=yystack.l_mark[-2][0]; arg2[f]= temp[f];}
+	else {arg1[f]=yystack.l_mark[-2][0]; arg2[f]= yystack.l_mark[-2][2]; } opr[f]= '*'; f++;}
 break;
 case 6:
-#line 30 "exp.yacc"
-	{count++;auxNeg=yyval;  sprintf(aux,"Nivel %d: %c ->\t/\t<- %s\n",count,yystack.l_mark[-2][0],yystack.l_mark[0]); arbol=concat(arbol, aux); nodoRaiz=yyval;}
+#line 44 "exp.yacc"
+	{count++;auxNeg=yyval;  sprintf(aux,"Nivel %d: %c ->\t/\t<- %s\n",count,yystack.l_mark[-2][0],yystack.l_mark[0]); arbol=concat(arbol, aux); nodoRaiz=yyval;
+	if(f-1!=-1){arg1[f]=yystack.l_mark[-2][0]; arg2[f]= temp[f];}
+	else {arg1[f]=yystack.l_mark[-2][0]; arg2[f]= yystack.l_mark[-2][2]; } opr[f]= '/'; f++;}
 break;
 case 7:
-#line 31 "exp.yacc"
-	{count++; auxNeg=yyval;  sprintf(aux,"Nivel %d: %c ->\t%\t<- %s\n",count,yystack.l_mark[-2][0],yystack.l_mark[0]); arbol=concat(arbol, aux); nodoRaiz=yyval;}
+#line 47 "exp.yacc"
+	{count++; auxNeg=yyval;  sprintf(aux,"Nivel %d: %c ->\t%\t<- %s\n",count,yystack.l_mark[-2][0],yystack.l_mark[0]); arbol=concat(arbol, aux); nodoRaiz=yyval;
+	if(f-1!=-1){arg1[f]=yystack.l_mark[-2][0]; arg2[f]= temp[f];}
+	else {arg1[f]=yystack.l_mark[-2][0]; arg2[f]= yystack.l_mark[-2][2]; } opr[f]= '%'; f++;}
 break;
 case 8:
-#line 32 "exp.yacc"
-	{count++; printf("\n(%s)\n",yystack.l_mark[-1]);}
+#line 50 "exp.yacc"
+	{count++; sprintf(aux,"Nivel %d: %c ->\t(\t<- %s\n",count,yystack.l_mark[-2][0],yystack.l_mark[-1]); arbol=concat(arbol, aux); nodoRaiz=yyval;/*printf("\n(%s)\n",$2); */
+	if(f-1!=-1){arg1[f]=yystack.l_mark[-2][0]; arg2[f]= temp[f];}
+	else {arg1[f]=yystack.l_mark[-2][0]; arg2[f]= yystack.l_mark[-2][2]; } opr[f]= '('; f++;}
 break;
 case 9:
-#line 33 "exp.yacc"
+#line 53 "exp.yacc"
 	{ yyval=yystack.l_mark[0]; auxNeg=yyval; printf("var: %s \t",yystack.l_mark[0]);}
 break;
-#line 474 "y.tab.c"
+#line 508 "y.tab.c"
     }
     yystack.s_mark -= yym;
     yystate = *yystack.s_mark;
@@ -488,12 +522,11 @@ break;
         *++yystack.l_mark = yyval;
         if (yychar < 0)
         {
-            yychar = YYLEX;
-            if (yychar < 0) yychar = YYEOF;
+            if ((yychar = YYLEX) < 0) yychar = YYEOF;
 #if YYDEBUG
             if (yydebug)
             {
-                if ((yys = yyname[YYTRANSLATE(yychar)]) == NULL) yys = yyname[YYUNDFTOKEN];
+                yys = yyname[YYTRANSLATE(yychar)];
                 printf("%sdebug: state %d, reading %d (%s)\n",
                         YYPREFIX, YYFINAL, yychar, yys);
             }
@@ -502,8 +535,8 @@ break;
         if (yychar == YYEOF) goto yyaccept;
         goto yyloop;
     }
-    if (((yyn = yygindex[yym]) != 0) && (yyn += yystate) >= 0 &&
-            yyn <= YYTABLESIZE && yycheck[yyn] == (YYINT) yystate)
+    if ((yyn = yygindex[yym]) && (yyn += yystate) >= 0 &&
+            yyn <= YYTABLESIZE && yycheck[yyn] == yystate)
         yystate = yytable[yyn];
     else
         yystate = yydgoto[yym];
@@ -512,7 +545,10 @@ break;
         printf("%sdebug: after reduction, shifting from state %d \
 to state %d\n", YYPREFIX, *yystack.s_mark, yystate);
 #endif
-    if (yystack.s_mark >= yystack.s_last && yygrowstack(&yystack) == YYENOMEM) goto yyoverflow;
+    if (yystack.s_mark >= yystack.s_last && yygrowstack(&yystack) == YYENOMEM)
+    {
+        goto yyoverflow;
+    }
     *++yystack.s_mark = (YYINT) yystate;
     *++yystack.l_mark = yyval;
     goto yyloop;

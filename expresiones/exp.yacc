@@ -11,6 +11,12 @@
 	char aux[100];
 	char *auxNeg="";
 	char *nodoRaiz="";
+	int f=0;
+	char opr [40];
+	char arg1[40];
+	char arg2[40];
+	char temp[7]={'0','1','2','3','4','5','6'};
+	
 %}
 
 
@@ -23,13 +29,27 @@
 /*Seccion de reglas*/
 %%
 T: E ;
-E:E '+' T {count++; auxNeg=$$;   sprintf(aux,"Nivel %d: %c ->\t+\t<- %s\n",count,$1[0],$3); arbol=concat(arbol, aux); nodoRaiz=$$; }
-|'-' T {count++;  sprintf(aux,"Nivel %d: neg  %s\n",count,auxNeg); arbol=concat(arbol, aux);  nodoRaiz=$$;}
-|E '-' T {count++; auxNeg=$$; sprintf(aux,"Nivel %d: %c ->\t-\t<- %s\n",count,$1[0],$3); arbol=concat(arbol, aux); nodoRaiz=$$;}
-|E '*' T {count++;auxNeg=$$;  sprintf(aux,"Nivel %d: %c ->\t*\t<- %s\n",count,$1[0],$3); arbol=concat(arbol, aux); nodoRaiz=$$;}
-|E '/' T {count++;auxNeg=$$;  sprintf(aux,"Nivel %d: %c ->\t/\t<- %s\n",count,$1[0],$3); arbol=concat(arbol, aux); nodoRaiz=$$;}
-|E'%'T {count++; auxNeg=$$;  sprintf(aux,"Nivel %d: %c ->\t%\t<- %s\n",count,$1[0],$3); arbol=concat(arbol, aux); nodoRaiz=$$;}
-|'(' E ')' {count++; printf("\n(%s)\n",$2);}
+E:E '+' T {count++; auxNeg=$$;   sprintf(aux,"Nivel %d: %c ->\t+\t<- %s\n",count,$1[0],$3); arbol=concat(arbol, aux); nodoRaiz=$$; 
+	if(f-1!=-1){arg1[f]=$1[0]; arg2[f]= temp[f];}
+	else {arg1[f]=$1[0]; arg2[f]= $1[2]; } opr[f]= '+'; f++;}
+|'-' T {count++;  sprintf(aux,"Nivel %d: neg  %s\n",count,auxNeg); arbol=concat(arbol, aux);  nodoRaiz=$$;
+	if(f-1!=-1){arg1[f]=$1[0]; arg2[f]= temp[f];}
+	else {arg1[f]=$1[0]; arg2[f]= $1[2]; } opr[f]= '-'; f++;}
+|E '-' T {count++; auxNeg=$$; sprintf(aux,"Nivel %d: %c ->\t-\t<- %s\n",count,$1[0],$3); arbol=concat(arbol, aux); nodoRaiz=$$;
+	if(f-1!=-1){arg1[f]=$1[0]; arg2[f]= temp[f];}
+	else {arg1[f]=$1[0]; arg2[f]= $1[2]; } opr[f]= '-'; f++;}
+|E '*' T {count++;auxNeg=$$;  sprintf(aux,"Nivel %d: %c ->\t*\t<- %s\n",count,$1[0],$3); arbol=concat(arbol, aux); nodoRaiz=$$;
+	if(f-1!=-1){arg1[f]=$1[0]; arg2[f]= temp[f];}
+	else {arg1[f]=$1[0]; arg2[f]= $1[2]; } opr[f]= '*'; f++;}
+|E '/' T {count++;auxNeg=$$;  sprintf(aux,"Nivel %d: %c ->\t/\t<- %s\n",count,$1[0],$3); arbol=concat(arbol, aux); nodoRaiz=$$;
+	if(f-1!=-1){arg1[f]=$1[0]; arg2[f]= temp[f];}
+	else {arg1[f]=$1[0]; arg2[f]= $1[2]; } opr[f]= '/'; f++;}
+|E'%'T {count++; auxNeg=$$;  sprintf(aux,"Nivel %d: %c ->\t%\t<- %s\n",count,$1[0],$3); arbol=concat(arbol, aux); nodoRaiz=$$;
+	if(f-1!=-1){arg1[f]=$1[0]; arg2[f]= temp[f];}
+	else {arg1[f]=$1[0]; arg2[f]= $1[2]; } opr[f]= '%'; f++;}
+|'(' E ')' {count++; sprintf(aux,"Nivel %d: %c ->\t(\t<- %s\n",count,$1[0],$2); arbol=concat(arbol, aux); nodoRaiz=$$;//printf("\n(%s)\n",$2); 
+	if(f-1!=-1){arg1[f]=$1[0]; arg2[f]= temp[f];}
+	else {arg1[f]=$1[0]; arg2[f]= $1[2]; } opr[f]= '('; f++;}
 | ALPHANUM { $$=$1; auxNeg=$$; printf("var: %s \t",$1);}
 
 ;
@@ -40,6 +60,8 @@ void yyerror(char *s) {
 	flag=-1;
 }
 void main(){
+	
+
 	printf("\nIngresa una expresion aritmetica:\n");
 	yyparse();
 	if(flag==0){
@@ -48,6 +70,15 @@ void main(){
 		count++;
 		printf("Nivel %d: %s",count,nodoRaiz);
 		printf("Counter de nodos: %d \n ",count);
+		printf("Op \t arg1 \t arg2 \n");
+		
+		for(int x=0; x<count; x++){
+			if(opr[x]=='(' )
+				printf(" %c) \t %c \t %c \n", opr[x], arg1[x], arg2[x]);
+			else
+				printf(" %c \t %c \t %c \n", opr[x], arg1[x], arg2[x]);
+		}
+		
 	}else{
 		printf("\nExpresion invalida\n\n");
 	}
